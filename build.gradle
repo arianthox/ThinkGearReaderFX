@@ -1,0 +1,96 @@
+
+plugins {
+    id 'org.springframework.boot' version '2.2.1.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+    id 'java'
+    id 'pmd'
+    id 'org.openjfx.javafxplugin' version '0.0.8'
+}
+
+javafx {
+    version = "14"
+    modules = [ 'javafx.controls', 'javafx.fxml','javafx.graphics']
+}
+
+def defaultEncoding = 'UTF-8'
+[compileJava, compileTestJava]*.options*.encoding = defaultEncoding
+
+group = 'com.globant/BrainWaves/ThinkGearReaderFX'
+version = '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    maven { url 'https://repo.spring.io/milestone' }
+    jcenter()
+}
+
+ext {
+    set('springCloudVersion', "Hoxton.RC2")
+}
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+configurations {
+    developmentOnly
+    runtimeClasspath {
+        extendsFrom developmentOnly
+    }
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+dependencies {
+    implementation 'net.rgielen:javafx-weaver-spring-boot-starter:1.3.0'
+//    implementation 'org.springframework.boot:spring-boot-starter-web'
+//    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+//    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-ribbon'
+//    implementation 'com.lightbend.akka:akka-stream-alpakka-udp_2.12:1.1.2'
+//    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    implementation 'org.json:json:20190722'
+//    implementation 'com.google.code.gson:gson:2.8.0'
+//    implementation 'net.sf.bluecove:bluecove:2.1.0'
+//    implementation 'org.rxtx:rxtx:2.1.7'
+//    implementation 'commons-codec:commons-codec:1.13'
+//    implementation 'io.vavr:vavr:0.10.2'
+    implementation 'org.openjfx:javafx-controls:14'
+
+    //implementation 'org.aerofx:aerofx:0.2'
+    implementation 'org.jfxtras:jmetro:8.6.9'
+    implementation 'eu.hansolo:Medusa:11.2'
+    implementation 'eu.hansolo:colors:1.4'
+
+
+    //compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+//    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+}
+
+sourceSets {
+    main {
+        java.srcDirs = ['src/main/java']
+    }
+}
+
+tasks.withType(Pmd){
+    reports{
+        xml.enabled=true
+        html.enabled=true
+    }
+}
+
+pmd {
+    ignoreFailures = true
+    pmdTest.enabled=false
+}

@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: ThinkGearReaderFX
+  main:
+    allow-bean-definition-overriding: true
+
+
+info:
+  # static properties
+  app:
+    name: ${spring.application.name}
+    description: --
+
+logging:
+  level:
+    root: info
+    com.globant.brainwaves.adapter: info
