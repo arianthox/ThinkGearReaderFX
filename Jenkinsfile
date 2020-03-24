@@ -1,3 +1,6 @@
+/* import shared library */
+@Library('jenkins-shared-library')_
+
 pipeline {
   environment {
       registry = "brainwaves/thinkgear-reader-fx"
@@ -20,4 +23,9 @@ pipeline {
     }
 
   }
+  post {
+        always {
+           slackNotificator(currentBuild.currentResult)
+        }
+    }
 }
