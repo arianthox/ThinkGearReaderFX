@@ -6,26 +6,40 @@ pipeline {
       registry = "brainwaves/thinkgear-reader-fx"
       registryCredential = 'dockerhub'
       dockerImage = ''
+      appName="ThinkGearReaderFX"
   }
   agent any
-  stages {
+    stages {
 
-    stage('Cloning Git') {
-      steps {
-        checkout scm
+      stage('Checkout') {
+                  steps {
+                      dir("Commons") {
+                          git branch: 'development',url: 'git@github.corp.globant.com:BrainWaves/Commons.git'
+                      }
+                      dir(appName){
+                          checkout scm
+                      }
+                  }
       }
-    }
 
-    stage('build_Project'){
-       steps{
-            sh './gradlew clean build'
-       }
-    }
+      stage('build_Project'){
+         steps{
+              dir(appName){
+                  sh './gradlew clean build'
+              }
+         }
+      }
 
-  }
-  post {
-        always {
-           slackNotificator(currentBuild.currentResult)
-        }
+      stage("Clean Workspace"){
+          steps{
+           step([$class: 'WsCleanup'])
+          }
+      }
+
+    }
+    post {
+          always {
+             slackNotificator(currentBuild.currentResult)
+          }
     }
 }
