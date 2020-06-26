@@ -1,90 +1,69 @@
 package com.globant.brainwaves.ui;
 
-import eu.hansolo.medusa.Gauge;
-import eu.hansolo.medusa.GaugeBuilder;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 @Component
 @FxmlView("main-form.fxml")
 public class MainController implements Initializable {
 
-    private static final Random RND            = new Random();
-
-//    @FXML
-//    private Gauge  gauge31;
+    private static final Random RND = new Random();
 
     private static final int MAX_DATA_POINTS = 50;
-    private String xSeriesData = "";
-    private XYChart.Series series1=null;
-
-    private BlockingQueue<Number> dataQ1 = new ArrayBlockingQueue<>(1024);
 
     @FXML
     private Button mainButton;
 
     @FXML
-    private CategoryAxis xAxis = new CategoryAxis();
-    @FXML
-    final NumberAxis yAxis = new NumberAxis();
-    @FXML
-    final LineChart<String, Number> lineChart = new LineChart<>(xAxis, yAxis);
+    private CategoryAxis yAxis;
 
-    final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
+    @FXML
+    private NumberAxis xAxis;
+
+    @FXML
+    private LineChart<String, Double> lineChart;
+
+    private AtomicInteger counter=new AtomicInteger(0);
 
     private ScheduledExecutorService scheduledExecutorService;
 
-    public void initGraph(){
-        if(series1==null) {
-            //Graph Series
-            series1 = new XYChart.Series<String, Number>();
-            series1.setName("Data");
-            lineChart.getData().add(series1);
-            System.out.println("InitGraph");
+    public void initGraph() {
+        ObservableList<LineChart.Series<String, Double>> observableSerieData = FXCollections.observableArrayList();
+        LineChart.Series<String, Double> seriesData = new LineChart.Series<String, Double>();
+        scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        scheduledExecutorService.scheduleAtFixedRate(() -> {
+            Platform.runLater(() -> {
+                double value = RND.nextDouble() * 1000 - 500;
+                seriesData.getData().add(new LineChart.Data<String, Double>("" +counter.incrementAndGet(), value));
+                if (seriesData.getData().size() > MAX_DATA_POINTS)
+                    seriesData.getData().remove(0);
+            });
+        }, 10,100, TimeUnit.MILLISECONDS);
 
-            // setup a scheduled executor to periodically put data into the chart
-            scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        observableSerieData.add(seriesData);
+        lineChart.setData(observableSerieData);
 
-            // put dummy data onto graph per second
-            scheduledExecutorService.scheduleAtFixedRate(() -> {
-
-                Platform.runLater(() -> {
-                    Date now = new Date();
-                    double value=RND.nextDouble()*1000-500;
-                    series1.getData().add(new XYChart.Data<String,Number>(simpleDateFormat.format(now), value ));
-                    System.out.println("Value:"+value);
-
-                    if (series1.getData().size() > MAX_DATA_POINTS)
-                        series1.getData().remove(0);
-
-                });
-            }, 0, 1, TimeUnit.SECONDS);
-        }
     }
 
     @FXML
     private void buttonClicked() {
-
         System.out.println("Button clicked!");
-
-
-        //gauge31.setValue(RND.nextDouble() * gauge31.getRange() + gauge31.getMinValue());
     }
 
     @Override

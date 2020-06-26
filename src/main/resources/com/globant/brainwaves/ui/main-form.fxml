@@ -1,35 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.image.Image?>
 <?scenebuilder-preview-i18n-resource Oscilloscope.properties?>
-<?import eu.hansolo.medusa.Gauge?>
-<?import javafx.scene.chart.LineChart?>
-<?import javafx.scene.chart.CategoryAxis?>
-<?import javafx.scene.chart.NumberAxis?>
-<BorderPane xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.globant.brainwaves.ui.MainController" cache="false">
+
+<BorderPane cache="false" prefHeight="660.0" prefWidth="919.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.globant.brainwaves.ui.MainController">
    <center>
-      <AnchorPane>
-<!--      <Gauge fx:id="gauge31" skinType="VERTICAL" averageVisible="false" animated="false" areasVisible="true" autoScale="true" oldValueVisible="true" maxValue="1000" minValue="-1000" customTickLabelFontSize="10"  />-->
-      <LineChart fx:id="lineChart" layoutX="29.0" layoutY="194.0" prefHeight="416.0" prefWidth="1222.0" title="Spectrum" animated="false" >
+      <AnchorPane prefHeight="105.0" prefWidth="919.0">
+      <LineChart fx:id="lineChart" animated="false" layoutX="11.0" layoutY="13.0" mouseTransparent="true" prefHeight="392.0" prefWidth="895.0" title="Spectrum">
          <xAxis>
-            <CategoryAxis animated="false" autoRanging="true" tickLabelsVisible="true" tickMarkVisible="true" label="Time (s)" fx:id="xAxis" />
+            <CategoryAxis fx:id="yAxis"  animated="true" autoRanging="true" label="Time (s)"  side="BOTTOM" />
          </xAxis>
          <yAxis>
-            <NumberAxis animated="false" autoRanging="true" fx:id="yAxis" label="BrainWaves" side="LEFT" upperBound="1000.0" lowerBound="-1000.0" />
+            <NumberAxis side="LEFT" fx:id="xAxis" animated="true" autoRanging="true" label="BrainWaves" lowerBound="-1000.0" upperBound="1000.0"  />
          </yAxis>
       </LineChart>
       </AnchorPane>
-
    </center>
    <top>
-      <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+      <ToolBar prefHeight="0.0" prefWidth="919.0" BorderPane.alignment="CENTER">
         <items>
-           <Button mnemonicParsing="false" fx:id="mainButton" onAction="#buttonClicked" >
+           <Button fx:id="mainButton" mnemonicParsing="false" onAction="#buttonClicked">
               <graphic>
 
                  <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">

@@ -1,8 +1,6 @@
 package com.globant.brainwaves;
 
 import com.globant.brainwaves.ui.MainController;
-import eu.hansolo.medusa.Gauge;
-import eu.hansolo.medusa.GaugeBuilder;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Parent;
@@ -39,7 +37,7 @@ public class FXStarter extends Application {
         Parent root = fxWeaver.loadView(MainController.class);
 
         stage.setTitle(applicationContext.getEnvironment().getProperty("spring.application.name"));
-        stage.setScene(new Scene(root, 700, 500));
+        stage.setScene(new Scene(root, 950, 500));
         stage.show();
     }
 
