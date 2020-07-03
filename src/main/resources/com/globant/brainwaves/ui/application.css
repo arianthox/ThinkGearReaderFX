@@ -12,6 +12,10 @@
     -fx-color-1:#1976D2;
 }
 
+.axis:top {
+    -fx-border-color: transparent transparent AXIS_COLOR transparent;
+}
+
 .root{
     -fx-background-color: -fx-primary;
 }

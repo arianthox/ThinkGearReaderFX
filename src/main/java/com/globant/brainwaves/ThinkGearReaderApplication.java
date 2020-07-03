@@ -8,7 +8,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.globant.brainwaves.commons","com.globant.brainwaves"})
 public class ThinkGearReaderApplication {
 
     public static void main(String[] args) {

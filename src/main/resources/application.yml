@@ -3,6 +3,12 @@ spring:
     name: ThinkGearReaderFX
   main:
     allow-bean-definition-overriding: true
+  kafka:
+    bootstrap-servers: broker:9092
+    consumer:
+      group-id: waves
+    template:
+      default-topic: raw
 
 
 info:

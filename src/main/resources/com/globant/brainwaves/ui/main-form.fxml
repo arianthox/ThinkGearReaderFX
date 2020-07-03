@@ -9,12 +9,12 @@
 <BorderPane cache="false" prefHeight="660.0" prefWidth="919.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.globant.brainwaves.ui.MainController">
    <center>
       <AnchorPane prefHeight="105.0" prefWidth="919.0">
-      <LineChart fx:id="lineChart" animated="false" layoutX="11.0" layoutY="13.0" mouseTransparent="true" prefHeight="392.0" prefWidth="895.0" title="Spectrum">
+      <LineChart fx:id="lineChart"  animated="false" layoutX="11.0" layoutY="13.0" mouseTransparent="false" prefHeight="392.0" prefWidth="895.0" title="Spectrum">
          <xAxis>
-            <CategoryAxis fx:id="yAxis"  animated="true" autoRanging="true" label="Time (s)"  side="BOTTOM" />
+            <NumberAxis fx:id="yAxis"  autoRanging="false" lowerBound="1" upperBound="100" label="Time (s)"  side="BOTTOM" />
          </xAxis>
          <yAxis>
-            <NumberAxis side="LEFT" fx:id="xAxis" animated="true" autoRanging="true" label="BrainWaves" lowerBound="-1000.0" upperBound="1000.0"  />
+            <NumberAxis side="LEFT" fx:id="xAxis" autoRanging="false" label="BrainWaves" lowerBound="-512" upperBound="512" minorTickVisible="false"  />
          </yAxis>
       </LineChart>
       </AnchorPane>
