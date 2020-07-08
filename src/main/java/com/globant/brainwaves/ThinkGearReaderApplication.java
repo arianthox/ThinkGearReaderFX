@@ -1,6 +1,7 @@
 package com.globant.brainwaves;
 
 import javafx.application.Application;
+import lombok.extern.java.Log;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.spring.SpringFxWeaver;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,10 +10,11 @@ import org.springframework.context.annotation.Bean;
 
 
 @SpringBootApplication(scanBasePackages = {"com.globant.brainwaves.commons","com.globant.brainwaves"})
+@Log
 public class ThinkGearReaderApplication {
 
     public static void main(String[] args) {
-        System.out.println("Starting SpringBoot");
+        log.info("Starting SpringBoot");
         Application.launch(FXStarter.class, args);
     }
 

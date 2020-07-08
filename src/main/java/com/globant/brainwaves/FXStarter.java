@@ -37,7 +37,8 @@ public class FXStarter extends Application {
         Parent root = fxWeaver.loadView(MainController.class);
 
         stage.setTitle(applicationContext.getEnvironment().getProperty("spring.application.name"));
-        stage.setScene(new Scene(root, 950, 500));
+        Scene scene=new Scene(root, 950, 900);
+        stage.setScene(scene);
         stage.show();
     }
 
