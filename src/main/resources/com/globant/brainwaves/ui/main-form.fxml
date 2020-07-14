@@ -7,7 +7,7 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane cache="false" prefHeight="660.0" prefWidth="919.0" stylesheets="application.css"
+<BorderPane cache="false" prefHeight="660.0" prefWidth="919.0"
             xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.globant.brainwaves.ui.MainController">
     <center>
@@ -23,7 +23,7 @@
                                 side="LEFT" upperBound="512" fx:id="xAxis"/>
                 </yAxis>
             </LineChart>
-            <LineChart fx:id="lineChannelChart" animated="false" layoutX="11.0" layoutY="405.0" mouseTransparent="false"
+            <StackedAreaChart fx:id="lineChannelChart" animated="false" layoutX="11.0" layoutY="405.0" mouseTransparent="false"
                        prefHeight="392.0" prefWidth="895.0" title="Channel Spectrum">
                 <xAxis>
                     <NumberAxis fx:id="yChannelAxis" autoRanging="false" label="Time (s)" lowerBound="1" side="BOTTOM"
@@ -33,23 +33,15 @@
                     <NumberAxis autoRanging="true" label="Neural Spectrum" lowerBound="-512" minorTickVisible="true"
                                 side="LEFT" upperBound="512" fx:id="xChannelAxis"/>
                 </yAxis>
-            </LineChart>
+            </StackedAreaChart>
         </AnchorPane>
 
     </center>
     <top>
         <ToolBar prefHeight="0.0" prefWidth="919.0" BorderPane.alignment="CENTER">
             <items>
-                <Button fx:id="mainButton" mnemonicParsing="false" onAction="#buttonClicked">
-                    <graphic>
-
-                        <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
-                            <image>
-                                <Image url="@brainwaves.png"/>
-                            </image>
-                        </ImageView>
-                    </graphic>
-                </Button>
+                <Button mnemonicParsing="true" onAction="#toggleAdd" text="_Start/Stop" />
+                <Button mnemonicParsing="true" onAction="#autoZoom" text="Auto _Zoom" />
             </items>
         </ToolBar>
     </top>

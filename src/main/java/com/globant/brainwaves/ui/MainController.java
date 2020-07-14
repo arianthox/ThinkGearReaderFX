@@ -13,6 +13,9 @@ import com.globant.brainwaves.commons.model.*;
 import com.globant.brainwaves.commons.utils.CommonUtil;
 import com.google.gson.Gson;
 import com.sun.javafx.charts.Legend;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,14 +24,16 @@ import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.chart.LineChart;
+import javafx.scene.chart.StackedAreaChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Button;
 import javafx.scene.input.MouseButton;
+import javafx.util.Duration;
 import lombok.extern.java.Log;
 import net.rgielen.fxweaver.core.FxmlView;
+import org.gillius.jfxutils.chart.ChartPanManager;
+import org.gillius.jfxutils.chart.JFXChartUtil;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.CompletionStage;
@@ -45,26 +50,29 @@ public class MainController implements Initializable {
     private static final Random RND = new Random();
 
     private static final int MAX_DATA_POINTS = 100;
-    final ObservableList<LineChart.Series<Integer, Integer>> observableSeriesData = FXCollections.observableArrayList();
-    final Map<String, LineChart.Series<Integer, Integer>> seriesMap = new TreeMap<>();
+    final double SCALE_DELTA = 1.1;
 
-    final ObservableList<LineChart.Series<Integer, Integer>> observableSeriesChannelData = FXCollections.observableArrayList();
-    final Map<String, LineChart.Series<Integer, Integer>> seriesChannelMap = new TreeMap<>();
+    final ObservableList<XYChart.Series<Integer, Integer>> observableSeriesData = FXCollections.observableArrayList();
+    final Map<String, XYChart.Series<Integer, Integer>> seriesMap = new TreeMap<>();
+
+    final ObservableList<XYChart.Series<Integer, Integer>> observableSeriesChannelData = FXCollections.observableArrayList();
+    final Map<String, XYChart.Series<Integer, Integer>> seriesChannelMap = new TreeMap<>();
 
     private final KafkaConsumer kafkaConsumer;
     private final transient Gson gson;
     private final transient ActorSystem system;
-    @FXML
-    private Button mainButton;
 
     @FXML
     private LineChart<Integer, Integer> lineChart;
 
     @FXML
-    private LineChart<Integer, Integer> lineChannelChart;
+    private StackedAreaChart<Integer, Integer> lineChannelChart;
 
 
     private AtomicInteger counter = new AtomicInteger(0);
+
+
+    private Timeline addDataTimeline;
 
 
     public MainController(KafkaConsumer kafkaConsumer, Gson gson) {
@@ -73,15 +81,35 @@ public class MainController implements Initializable {
         system = ActorSystem.create(Behaviors.empty(), "think-gear-fx-system");
     }
 
-    @PostConstruct
-    private void initialize() {
-
+    @FXML
+    void autoZoom() {
+        lineChart.getXAxis().setAutoRanging( true );
+        lineChart.getYAxis().setAutoRanging( true );
     }
 
     @FXML
-    private void buttonClicked() {
-        System.out.println("Button clicked!");
+    void toggleAdd() {
+        switch ( this.kafkaConsumer.getStatus() ) {
+            case STOPPED:
+                this.kafkaConsumer.resume();
+                lineChart.getXAxis().setAutoRanging( true );
+                lineChart.getYAxis().setAutoRanging( true );
+                //Animation looks horrible if we're updating a lot
+                lineChart.setAnimated( false );
+                lineChart.getXAxis().setAnimated( false );
+                lineChart.getYAxis().setAnimated( false );
+                break;
+            case RUNNING:
+                this.kafkaConsumer.pause();
+                //Return the animation since we're not updating a lot
+                lineChart.setAnimated( true );
+                lineChart.getXAxis().setAnimated( true );
+                lineChart.getYAxis().setAnimated( true );
+                break;
 
+            default:
+                throw new AssertionError( "Unknown status" );
+        }
     }
 
     private void addRawGraphPoint(String series, int... values) {
@@ -117,7 +145,7 @@ public class MainController implements Initializable {
     }
 
     private void registerSeries(String name, String key){
-        LineChart.Series<Integer,Integer> s=new LineChart.Series<>();
+        XYChart.Series<Integer,Integer> s=new XYChart.Series<>();
         s.setName(name);
 
         seriesMap.put(key,s);
@@ -125,17 +153,17 @@ public class MainController implements Initializable {
 
 
     private void registerChannelSeries(String name, String key){
-        LineChart.Series<Integer,Integer> s=new LineChart.Series<>();
+        XYChart.Series<Integer,Integer> s=new XYChart.Series<>();
         s.setName(name);
         seriesChannelMap.put(key,s);
     }
 
-    private void enableLegendAction(LineChart<Integer, Integer> lineChart){
-        for (Node n : lineChart.getChildrenUnmodifiable()) {
+    private void addCustomActions(final XYChart<Integer, Integer> chart){
+        for (Node n : chart.getChildrenUnmodifiable()) {
             if (n instanceof Legend) {
                 Legend l = (Legend) n;
                 for (Legend.LegendItem li : l.getItems()) {
-                    for (XYChart.Series<Integer, Integer> s : lineChart.getData()) {
+                    for (XYChart.Series<Integer, Integer> s : chart.getData()) {
                         if (s.getName().equals(li.getText())) {
                             li.getSymbol().setCursor(Cursor.HAND); // Hint user that legend symbol is clickable
                             li.getSymbol().setOnMouseClicked(me -> {
@@ -144,7 +172,6 @@ public class MainController implements Initializable {
                                     for (XYChart.Data<Integer, Integer> d : s.getData()) {
                                         if (d.getNode() != null) {
                                             d.getNode().setVisible(s.getNode().isVisible()); // Toggle visibility of every node in the series
-                                            d.setExtraValue("Prueba");
                                         }
                                     }
                                 }
@@ -155,6 +182,7 @@ public class MainController implements Initializable {
                 }
             }
         }
+
     }
 
     @Override
@@ -176,9 +204,12 @@ public class MainController implements Initializable {
         registerChannelSeries("LowGamma","lowGamma");
         registerChannelSeries("HighGamma","highGamma");
 
-
-
-
+        addDataTimeline = new Timeline( new KeyFrame(
+                Duration.millis( 250 ),
+                actionEvent -> {
+                }
+        ));
+        addDataTimeline.setCycleCount( Animation.INDEFINITE );
 
 
         log.info("Initializing Kafka Consumer");
@@ -236,10 +267,29 @@ public class MainController implements Initializable {
         lineChannelChart.setAnimated(true);
         lineChannelChart.setCache(true);
 
-        enableLegendAction(lineChart);
-        enableLegendAction(lineChannelChart);
+        addCustomActions(lineChart);
 
+        ChartPanManager panner1 = new ChartPanManager( lineChart );
+        panner1.setMouseFilter(mouseEvent -> {
+            if ( mouseEvent.getButton() == MouseButton.SECONDARY ||
+                    ( mouseEvent.getButton() == MouseButton.PRIMARY &&
+                            mouseEvent.isShortcutDown() ) ) {
+                //let it through
+            } else {
+                mouseEvent.consume();
+            }
+        });
+        panner1.start();
 
+        JFXChartUtil.setupZooming( lineChart, mouseEvent -> {
+            if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
+                    mouseEvent.isShortcutDown() )
+                mouseEvent.consume();
+        });
+
+        JFXChartUtil.addDoublePrimaryClickAutoRangeHandler( lineChart );
+
+        addCustomActions(lineChannelChart);
 
     }
 }
