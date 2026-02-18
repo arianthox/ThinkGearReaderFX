@@ -35,3 +35,6 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**
 !**/src/test/**
+
+# IDE/output folders
+bin/

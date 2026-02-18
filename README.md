@@ -1,46 +1,44 @@
 # ThinkGearReaderFX
-===========================================
 
-The purpose of this project is to provide a UI for ThinkGearReader in order to Analyze the BrainWaves Spectrum
+## Overview
 
+Legacy JavaFX operator UI that consumes brainwave stream events and renders realtime charts/spectrum views.
 
-Technologies
-------------
+## Scope in BrainWaves
 
-+ java
-+ javafx
-+ Spring
-+ docker
-+ gradle
+- In-scope as compatibility visualization client
+- Main consumed topic: `think_gear_reader`
+- Main producer dependency: `ThinkGearReader`
 
-Prerequisites
---------------
+## Tech Stack
 
+- Java 11
+- JavaFX 14
+- Spring Boot 2.2.x
+- Akka Kafka consumer
+- Gradle
 
-How To Compile
---------------
+## Build
 
-The service can be compiled with:
-
-```
-gradle clean build
+```bash
+./gradlew clean build
 ```
 
+## Run
 
-How To Run
---------------
-
-The service can be executed with:
-
-```
-gradle bootRun
+```bash
+./gradlew bootRun
 ```
 
+## Key Configuration / Integration
 
-Successful compilation conditions
---------------
-This project uses pmd, findbugs, jacoco to guaranty the quality of the code.
+- Config file: `src/main/resources/application.yml`
+- Important keys:
+  - `spring.kafka.bootstrap-servers`
+  - `spring.kafka.consumer.group-id`
+- Cross-repo dependency: `:commons` via `settings.gradle` (legacy path expectation: `../Commons`)
 
-In addition there is a jacoco task that is attached to the build lifecycle that prevents the successful compilation of the project if there is no enought unit test code coverage.
+## Status / Notes
 
-The current minimun coverage percentage is: 80 %
+- Keep current flow active during migration.
+- Planned enhancement: toggle old topic (`think_gear_reader`) and new canonical topics (`brainwaves.cleaned.v1`, `brainwaves.events.v1`).
